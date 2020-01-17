@@ -6,12 +6,8 @@ class General():
     def required(request_data, *validation_args):
         error_msg = 'This field is required'
 
-        if request_data is None :
+        if request_data in (None, ''):
             return {'status': False, 'message': error_msg}
-            
-        if not isinstance(request_data, int):
-            if len(request_data) == 0:
-                return {'status': False, 'message': error_msg}
         
         return {'status': True}
 
@@ -41,7 +37,7 @@ class General():
     
     @staticmethod
     def alpha(request_data, *validator_args):
-        error_msg = 'This field must contain on alphabets (A-Za-z)'
+        error_msg = 'This field must contain an alphabets (A-Za-z)'
         if not request_data.isalpha()  :
             return {'status': False, 'message': error_msg}
         return {'status': True}
@@ -50,6 +46,20 @@ class General():
     def alphanumeric(request_data, *validator_args):
         error_msg = 'This field must contain both alphabets and numbers (A-Za-z0-9)'
         if not request_data.isalnum():
+            return {'status': False, 'message': error_msg}
+        return {'status': True}
+
+    @staticmethod
+    def is_int(request_data, *validator_args):
+        error_msg = 'This field must contain an integer'
+        if not isinstance(request_data, int):
+            return {'status': False, 'message': error_msg}
+        return {'status': True}
+
+    @staticmethod
+    def is_float(request_data, *validator_args):
+        error_msg = 'This field must contain an float'
+        if not isinstance(request_data, float):
             return {'status': False, 'message': error_msg}
         return {'status': True}
     
