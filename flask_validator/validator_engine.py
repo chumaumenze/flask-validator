@@ -59,12 +59,15 @@ class ValidatorEngine(object):
 
     @staticmethod
     def ruleSplitter(data):
-        rules = data.split(':')
+        rules = data.split(':', 1)
         validator = rules[0]
         if not len(rules) > 1:
             return validator, []
-        args = rules[1].split(',')
-        return validator, tuple(args)
+        args = tuple(
+            (rules[1],) if validator == 'regex'
+            else rules[1].split(',')
+        )
+        return validator, args
 
     def json(self, rules):
         data = request.get_json(force=True)
