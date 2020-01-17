@@ -1,16 +1,14 @@
-import sys
-import traceback
-
 from functools import wraps
 
-from flask import current_app, request, jsonify, session
+from flask import request
 
 from .error_bag import ErrorBag
 from .validators import validators
 from .exceptions import ValidatorAttributeError, ValidatorKeyError
 
+
 class ValidatorEngine(object):
-  
+
     def __init__(self, app=None, db=None):
         self.app = app
         if app is not None and db is not None:
@@ -36,9 +34,10 @@ class ValidatorEngine(object):
                         '''%s passed, expecting json or form_data or query_string or headers''' \
                         % (validation_type))
             return inner_wrapper
+
         return wrapper
 
-    def validate(self, data, validation_rules):
+    def check_values(self, data, validation_rules):
         self.errors = ErrorBag()
         for field, rules in validation_rules.items():
             for rule in rules:
@@ -52,7 +51,7 @@ class ValidatorEngine(object):
                 except KeyError:
                     raise ValidatorKeyError(
                         validator_name, 'Built-in validator specified not known')
-                
+
                 if not validation_result['status']:
                     self.errors.addError(field, validation_result['message'])
                     break
@@ -71,21 +70,18 @@ class ValidatorEngine(object):
 
     def json(self, rules):
         data = request.get_json(force=True)
-        self.validate(data, rules)
-        if self.errors.hasErrors():
-            return False
-        return True
+        return self.validate(data, rules)
 
     def query_string(self, rules):
         data = request.args.to_dict()
-        self.validate(data, rules)
-        if self.errors.hasErrors():
-            return False
-        return True
+        return self.validate(data, rules)
 
     def headers(self, rules):
-        data = request.headers()
-        self.validate(data, rules)
+        data = request.headers
+        return self.validate(data, rules)
+
+    def validate(self, data, rules):
+        self.check_values(data, rules)
         if self.errors.hasErrors():
             return False
         return True
