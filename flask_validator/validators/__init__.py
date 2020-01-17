@@ -6,6 +6,8 @@ validators = {
     'max': General.max,
     'min': General.min,
     'alpha': General.alpha,
+    'integer': General.is_int,
+    'float': General.is_float,
     'alphanumeric': General.alphanumeric,
     'list': General.list,
     'bool': General.boolean,
